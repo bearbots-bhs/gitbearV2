@@ -1,0 +1,18 @@
+h1 {
+    font-family: Montserrat, Space Grotesk, Futura;
+    font-weight: 800;
+    text-align: center;
+}
+h2, h3 {
+    font-family: Space Grotesk, Montserrat, Futura;
+    text-align: center;
+}
+
+h4, h5, h6, p {
+    font-family: Space Mono, Space Grotesk, Courier New;
+    text-align: center;
+}
+
+a {
+    color: white;
+}
