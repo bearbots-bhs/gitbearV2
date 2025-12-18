@@ -18,3 +18,4 @@
 <Navbar />
 <div style="height: 30px"></div>
 {@render children()}
+<div style="height: 70px"></div>
