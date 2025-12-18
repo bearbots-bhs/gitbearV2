@@ -20,6 +20,9 @@
         let year = $page.params.slug;
 
         let configRaw = await fetch(`https://raw.githubusercontent.com/bearbots-bhs/${year}/refs/heads/main/config.json`);
+        if (!configRaw.ok) {
+            window.location.href = base + "/view";
+        }
         let config = await configRaw.json();
         
         title = config[0].name;
@@ -41,11 +44,16 @@
         font-family: Space Grotesk, Space Mono, Montserrat, Futura;
         font-size: 15px;
         padding: 10px;
+        transition: font-size 0.1s ease-in;
+    }
+    #returnButton:hover {
+        font-size: 17px;
+        box-shadow: 0px 0px 5px 10px rgba(62, 62, 165, 0.308);
     }
 
     #codeDisplay div {
         width: 72em;
-        height: 26em;
+        height: 28em;
         background-color: rgb(44, 64, 88);
         border-radius: 20px;
         overflow-y: scroll;
@@ -59,6 +67,11 @@
             margin: 0;
             text-align: left;
         }
+
+        ::-webkit-scrollbar-track {
+            background: rgb(24, 36, 43);
+        }
+
         
     }
     #scriptsDisplay {
@@ -70,8 +83,14 @@
             font-size: 15px;
             padding: 10px;
         }
+        button:hover {
+            box-shadow: 0px 0px 5px 10px rgba(62, 62, 165, 0.432);
+        }
         button.selected {
             background-color: rgb(223, 97, 24);
+        }
+        button.selected:hover {
+            box-shadow: 0px 0px 5px 10px rgba(165, 100, 62, 0.267);
         }
     }
 </style>

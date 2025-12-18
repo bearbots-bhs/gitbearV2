@@ -36,7 +36,7 @@
             }
             else {
                 if (archive.length > 0) {
-                    loadMessage = "Uh oh; there was an error ;-;";
+                    loadMessage = `Found ${archive.length} results`;
                 }
                 break;
             }
@@ -134,7 +134,7 @@
     <h1 transition:slide style="user-select: none;"><span id="titleSpan">BEARBOTS</span> ONBOT JAVA ARCHIVE</h1>
     <h3 style="margin-top: 80px; margin-bottom: 50px;" transition:fade={{delay: 500}}>{loadMessage}</h3>
     {#each archiveSorted as x}
-        <div class="season">
+        <div class="season" transition:slide={{delay:1000}}>
             <h2>{x[0]}  <span>{x[1]}/{x[1]+1}</span></h2>
             <h4><i>Contains {x[3]} scripts</i></h4>
             <h3><button onclick = {() => {window.location.href = base + `/view/${x[1]}`}}><span translate="no" title="View Scripts" class="material-symbols-outlined">code_blocks</span></button><button onclick={() => {window.location.href = `https://github.com/bearbots-bhs/${x[1]}/archive/refs/heads/main.zip`}}><span translate="no" title="Download Scripts" class="material-symbols-outlined">download</span></button><button onclick={() => {window.location.href = `https://github.com/bearbots-bhs/${x[1]}`}}><span translate="no" title="View GitHub Repository" class="material-symbols-outlined">data_object</span></button></h3>
