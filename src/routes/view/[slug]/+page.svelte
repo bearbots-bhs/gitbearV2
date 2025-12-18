@@ -88,6 +88,7 @@
         }
         button.selected {
             background-color: rgb(223, 97, 24);
+            box-shadow: 0px 0px 5px 10px rgba(165, 100, 62, 0.267);
         }
         button.selected:hover {
             box-shadow: 0px 0px 5px 10px rgba(165, 100, 62, 0.267);
