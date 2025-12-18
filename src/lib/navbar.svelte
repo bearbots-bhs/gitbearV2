@@ -1,6 +1,7 @@
 <script>
     import { fly } from 'svelte/transition';
     import { onMount } from "svelte";
+    import { base } from "$app/paths";
 
     /*
     let toggle = $state(false);
@@ -9,6 +10,8 @@
         setTimeout(() => {toggle = true}, 100);
     })
         */
+
+    let link = base + "/images/logo.png"
 </script>
 <style>
     #navbar {
@@ -46,5 +49,5 @@
 </style>
 
 <div id="navbar" transition:fly = {{y: 200, duration: 1000}}>
-    <h3><img src="/images/logo.png" translate="no" alt="logo"/> <span>V2 | <a style:color="black" href="https://github.com/bearbots-bhs/gitbearV2">View Repo</a></span></h3>
+    <h3><img src = link translate="no" alt="logo"/> <span>V2 | <a style:color="black" href="https://github.com/bearbots-bhs/gitbearV2">View Repo</a></span></h3>
 </div>
