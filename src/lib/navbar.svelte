@@ -2,11 +2,13 @@
     import { fly } from 'svelte/transition';
     import { onMount } from "svelte";
 
+    /*
     let toggle = $state(false);
 
     onMount(() => {
         setTimeout(() => {toggle = true}, 100);
     })
+        */
 </script>
 <style>
     #navbar {
@@ -16,6 +18,7 @@
         left: 0;
         height: 70px;
         background-color: rgb(255, 255, 255);
+        z-index: 1000;
         
         h3 {
             position: relative;
@@ -41,8 +44,7 @@
         }
     }
 </style>
-{#if toggle}
-    <div id="navbar" transition:fly = {{y: 200, duration: 1000}}>
-        <h3><img src="logo.png" alt="logo"/> <span>V2</span></h3>
-    </div>
-{/if}
+
+<div id="navbar" transition:fly = {{y: 200, duration: 1000}}>
+    <h3><img src="/images/logo.png" translate="no" alt="logo"/> <span>V2 | <a style:color="black" href="https://github.com/bearbots-bhs/gitbearV2">View Repo</a></span></h3>
+</div>
