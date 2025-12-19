@@ -31,9 +31,12 @@ button {
         width: 30px;
         height: 30px;
     }
-    transition: box-shadow 0.3s ease-in-out;
+    transition: box-shadow 0.3s ease-in-out, transform 0.1s ease-in;
 }
 button:hover {
     cursor: pointer;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.349);
+}
+button:active {
+    transform: scale(0.90);
 }
