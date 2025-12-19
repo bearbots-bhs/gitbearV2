@@ -16,6 +16,8 @@
 
     let script = $state("");
 
+    let force = $state("");
+
 
     onMount(async() => {
         setTimeout(() => {toggle = true}, 100);
@@ -33,7 +35,7 @@
     });
 
     async function displayCode(fileName, task) {
-        let scriptRaw = await fetch(`https://raw.githubusercontent.com/bearbots-bhs/${$page.params.slug}/refs/heads/main/${fileName}`)
+        let scriptRaw = await fetch(`https://raw.githubusercontent.com/bearbots-bhs/${$page.params.slug}/refs/heads/main/${fileName}${force}`)
         
         script = await scriptRaw.text();
         //console.log(script);
@@ -46,6 +48,15 @@
             return;
         }
         await navigator.clipboard.writeText(script);
+    }
+
+    function forceGen() {
+        let time = new Date();
+        force = "?sync=" + time.getTime();
+
+        script = "";
+        selected = "";
+        code = "// Files should now be synced; if not, wait a few minutes before trying again. Click buttons to load scripts."
     }
  
 </script>
@@ -111,13 +122,20 @@
             box-shadow: 0px 0px 5px 10px rgba(165, 100, 62, 0.267);
         }
     }
-    #devModeButton {
+    #forceButton {
         position: fixed;
         right: 15px;
         top: 15px;
-        display: none;
     }
-    #devModeButton:hover {
+    #forceButton:hover {
+        box-shadow: 0px 0px 3px 6px rgba(105, 105, 148, 0.432);
+    }
+    #repoButton {
+        position: fixed;
+        right: 70px;
+        top: 15px;
+    }
+    #repoButton:hover {
         box-shadow: 0px 0px 3px 6px rgba(105, 105, 148, 0.432);
     }
 </style>
@@ -125,14 +143,14 @@
 {#if toggle}
     <h1 transition:slide style="user-select: none;">{title}</h1>
     <h3 style="margin-top: 10px; margin-bottom: 50px" transition:fade={{delay: 100}}><button id="returnButton" onclick = {() => {window.location.href = base + "/"}}>Return</button></h3>
-    <button transition:fly={{y:-200}} id="devModeButton" title="Development Mode"><span translate = "no" class="material-symbols-outlined">deployed_code_update</span></button>
+    <h3><button id="repoButton" onclick={() => {window.location.href = `https://github.com/bearbots-bhs/${$page.params.slug}`}} transition:fly={{y:-200, delay:100}}><span translate="no" title="View GitHub Repository" class="material-symbols-outlined">data_object</span></button> <button onclick = {forceGen} transition:fly={{y:-200, delay: 200}} id="forceButton" title="Sync Recent Changes"><span translate = "no" class="material-symbols-outlined">deployed_code_update</span></button></h3>
     <table>
         <tbody>
             <tr id="generalDisplay">
                 <td id="codeDisplay">
                     <div>
                         <h4><pre><code>{code}</code></pre></h4>
-                        {#if script.length > 0}<button transition:fly={{y:100}} onclick = {copyCode} id="copyButton"><span class="material-symbols-outlined">file_copy</span></button>{/if}
+                        {#if script.length > 0}<button title="Copy Script Contents" transition:fly={{y:100}} onclick = {copyCode} id="copyButton"><span class="material-symbols-outlined">file_copy</span></button>{/if}
                     </div>
                 </td>
                 <td id="scriptsDisplay">
