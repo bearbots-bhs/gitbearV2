@@ -56,7 +56,7 @@
 
         script = "";
         selected = "";
-        code = "// Files should now be synced; if not, wait a few minutes before trying again. Click buttons to load scripts."
+        code = "// Files should now be synced; if not, wait a few minutes before trying again. Click buttons to load scripts //"
     }
  
 </script>
@@ -150,7 +150,7 @@
                 <td id="codeDisplay">
                     <div>
                         <h4><pre><code>{code}</code></pre></h4>
-                        {#if script.length > 0}<button title="Copy Script Contents" transition:fly={{y:100}} onclick = {copyCode} id="copyButton"><span class="material-symbols-outlined">file_copy</span></button>{/if}
+                        {#if script.length > 0}<button title="Copy Script Contents" transition:fly={{y:100}} onclick = {copyCode} id="copyButton"><span translate = "no" class="material-symbols-outlined">file_copy</span></button>{/if}
                     </div>
                 </td>
                 <td id="scriptsDisplay">
