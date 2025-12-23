@@ -8,6 +8,17 @@
 
     onMount(() => {
         setTimeout(() => {toggle = true}, 100);
+
+        setTimeout(() => {
+            if (archive.length == 0) {
+                loadMessage = "Shouldn't be too much longer! Gitbear won't work properly if you aren't connected to internet";
+            }
+        }, 4000);
+        setTimeout(() => {
+            if (archive.length == 0) {
+                loadMessage = "There might be something wrong with gitbear right now, try again later ;-;";
+            }
+        }, 10000);
     })
 
     let archive = $state([]);
