@@ -69,6 +69,7 @@
 
     function scanCode() {
         sessionStorage.setItem("scanThis", script);
+        sessionStorage.setItem('returnPortal', $page.params.slug);
         //console.log(sessionStorage.getItem("scanThis"));
         window.location.href = base + "/scan";
     }
