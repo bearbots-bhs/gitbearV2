@@ -60,6 +60,13 @@
         }
 
     })
+
+    function scanCode() {
+        sessionStorage.removeItem("scanThis");
+        sessionStorage.removeItem("returnPortal");
+
+        window.location.href = base + "/scan"
+    }
 </script>
 <style>
     #titleSpan {

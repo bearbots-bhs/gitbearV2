@@ -17,7 +17,6 @@
 
     import hljs from 'highlight.js/lib/core';
     import java from 'highlight.js/lib/languages/java'
-    import { passive } from 'svelte/legacy';
     hljs.registerLanguage("java", java);
 
 
@@ -25,7 +24,7 @@
         loading = true;
         let script = sessionStorage.getItem("scanThis");
         if (script == null) {
-            window.location.href = base + "/view"
+            window.location.href = base + "/scan/import"
         }
     
         //console.log(script);
@@ -33,6 +32,13 @@
         code = hljs.highlight(code, { language: "java" }).value;
         scanCode(script);
     });
+
+    let repo = $state("");
+    onMount(() => {
+        if (sessionStorage.getItem("returnPortal") != null) {
+            repo = sessionStorage.getItem("returnPortal");
+        }
+    })
 
     onMount(() => {
         setTimeout(() => {toggle = true}, 100)
@@ -53,6 +59,7 @@
             lines[i] = lines[i].trim();
         }
         lines = lines.filter(line => line != "");
+        lines = lines.filter(line => line.substring(0,2) != "//" && line.substring(0,2) != "/*");
         //console.log(lines);
 
         logs.push([false, "Processing...", "Analyzing script", ""]);
@@ -60,6 +67,9 @@
         let mode = "";
         let hardwareClasses = [];
         let hardwareDevices = [];
+
+        let storedLine = 0;
+        let storedContent = "";
 
         let error = true;
         for (let i = 0; i < lines.length; i++) {
@@ -107,6 +117,7 @@
         error = true
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].indexOf("@Override")== 0) {
+                logs.push([0, "Override Tag", "All code that forms the base of the instruction needs to be inside the runOpMode() function. Since we are overwriting the contents of this function from the super class, it is good practice to include an @Override statement right before.", lines[i]])
                 error = false;
                 if (lines[i+1].indexOf("public void runOpMode() {") == 0) {
                     break;
@@ -126,6 +137,10 @@
                 if (lines[i].indexOf("extends LinearOpMode") < 0) {
                     logs.push([true, "Does not extend LinearOpMode", "This class does not extend LinearOpMode. Fix the line above.", lines[i]]);
                 }
+                else {
+                    logs.push([0, "Extend LinearOpMode", "The main public class that comprises the script must extend LinearOpMode, which we import at the start.", lines[i]])
+                }
+                break;
             }
         }
         if (error) {
@@ -137,17 +152,25 @@
             for (let i = 0; i < lines.length; i++) {
                 if (lines[i].trim().indexOf("waitForStart()") == 0) {
                     error = false;
-                    if (lines[i+1].trim().indexOf("opModeIsActive()") >= 0) {
-                        break;
-                    }
-                    else {
-                        logs.push([1, "Active Code Failsafe Not Present", "After checking for the start button being pressed, all further non-declarative code should be encapsulated in a failsafe conditional-statement that checks the function opModeIsActive().", lines[i]])
-                        break;
-                    }
+                    storedLine = i;
+                    storedContent = lines[i];
+                    break;
                 }
             }
             if (error) {
                 logs.push([1, "waitForStart Function Missing", "You do not have a waitForStart() function to pause between initialization and the start of the round. This is critical to have.", ""])
+            }
+            else  {
+                error = true;
+                for (let i = storedLine; i < lines.length; i++) {
+                    if (lines[i].trim().indexOf("if") >= 0 && lines[i].trim().indexOf("opModeIsActive()") >= 0) {
+                        error = false;
+                        break;
+                    }
+                }
+                if (error) {
+                    logs.push([1, "Active Code Failsafe Not Present", "After checking for the start button being pressed, all further non-declarative code should be encapsulated in a failsafe conditional-statement that checks the function opModeIsActive().", storedContent])
+                }
             }
         }
         if (mode == "teleop") {
@@ -156,6 +179,11 @@
             for (let i = 0; i < lines.length; i++) {
                 if (lines[i].trim().indexOf("waitForStart()") == 0) {
                     error = false;
+                    storedLine = i;
+                    storedContent = lines[i];
+                    break;
+
+                    /*
                     if (lines[i+1].trim().indexOf("while (opModeIsActive()") >= 0) {
                         break;
                     }
@@ -163,10 +191,23 @@
                         logs.push([1, "Code Looping Not Present", "After checking for the start button being pressed, all game controller actions are only processed for a fraction of a second. The code that follows needs to be encapsulated in a while-loop that checks the function opModeIsActive(). <br><br>*Ignore this if you are calibrating after waitForStart().", lines[i]])
                         break;
                     }
+                        */
                 }
             }
             if (error) {
                 logs.push([1, "waitForStart Function Missing", "You do not have a waitForStart() function to pause between initialization and the start of TeleOp. This is critical to have.", ""])
+            }
+            else {
+                error = true;
+                for (let i = storedLine; i < lines.length; i++) {
+                    if (lines[i].trim().indexOf("while") >= 0 && lines[i].trim().indexOf("opModeIsActive()") >= 0) {
+                        error = false;
+                        break;
+                    }
+                }
+                if (error) {
+                    logs.push([1, "Code Looping Not Present", "After checking for the start button being pressed, all game controller actions are only processed for a fraction of a second. The code that follows needs to be encapsulated in a while-loop that checks the function opModeIsActive(). <br><br>*Ignore this if you are calibrating after waitForStart().", storedContent])
+                }
             }
         }
         error = true;
@@ -204,7 +245,21 @@
                 }
                 if (hardwareClasses.indexOf(processHardware) >= 0) {
                     if (processName.indexOf("(") < 0 && processName.indexOf(")") < 0) {
-                        processName = process.substring(processHardware.length).trim();
+                        processName = "";
+                        if (process.indexOf("//") < 0 && process.indexOf("/*") < 0) {
+                            processName = process.substring(processHardware.length).trim();
+                        }     
+                        else {
+                            for (let k = processHardware.length; k < process.length; k++) {
+                                if (process.substring(k, k+1) != ";") {
+                                    processName += process.substring(k, k+1);
+                                }
+                                else {
+                                    processName = processName.trim();
+                                    break;
+                                }
+                            }
+                        }
                         hardwareDevices.push([processName, processHardware, 0]);
                     }
                     else {
@@ -286,6 +341,18 @@
         logs.push([0, "Finished", "Scanning is now finished; there should be no further critical errors. If you are running into further issues, consult other sources or use debugging strategies to solve your issue!", ""]);
         loading = false;
     }
+
+    let hideRepo = $state(false);
+    onMount(() => {
+        document.addEventListener("scroll", () => {
+            if (scrollY > 50) {
+                hideRepo = true;
+            }
+            else {
+                hideRepo = false;
+            }
+        })
+    })
  
 </script>
 <style>
@@ -372,6 +439,16 @@
             transform: rotate(360deg);
         }
     }
+
+    #repoButton {
+        position: fixed;
+        z-index: 1000;
+        right: 15px;
+        top: 15px;
+    }
+    #repoButton:hover {
+        box-shadow: 0px 0px 3px 6px rgba(105, 105, 148, 0.432);
+    }
 </style>
  <svelte:head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/a11y-dark.min.css">
@@ -385,6 +462,7 @@
             <h4><span class="material-symbols-outlined">progress_activity</span></h4>
         </div>
     {/if}
+    {#if repo != "" && !hideRepo}<h3><button id="repoButton" onclick={() => {window.location.href = `https://github.com/bearbots-bhs/${repo}`}}><span translate="no" title="View GitHub Repository" class="material-symbols-outlined">data_object</span></button></h3>{/if}
     <table>
         <tbody>
             <tr id="generalDisplay">

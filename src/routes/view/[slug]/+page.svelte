@@ -86,17 +86,20 @@
     }
 
     #codeDisplay div {
-        width: 71em;
+        width: 78vw;
+        min-width: 40vw;
         height: 28em;
         background-color: rgb(60, 62, 94);
         border-radius: 20px;
-        overflow-y: scroll;
         margin-right: 20px;
         margin-left: 20px;
         text-align: left;
         padding: 10px;
         padding-left: 40px;
         position: relative;
+
+        overflow-y: scroll;
+        resize: horizontal;
 
         pre {
             white-space: pre;
@@ -142,7 +145,7 @@
         }
         button:hover {
             box-shadow: 0px 0px 5px 10px rgba(62, 62, 165, 0.432);
-        }
+        } 
         button.selected {
             background-color: rgb(223, 97, 24);
             box-shadow: 0px 0px 5px 10px rgba(165, 100, 62, 0.267);
